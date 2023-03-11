@@ -1,0 +1,23 @@
+#[cfg(feature = "cpi")]
+pub fn cpi_create_with_pda<'a, 'b, 'c, 'info>(
+    cpi_ctx: crate::CpiContext<'a, 'b, 'c, 'info, crate::cpi::accounts::MockThreadCreate<'info>>,
+    amount: u64,
+) -> Result<()> {
+    // replace with more complex thing
+    let space = 256;
+    let total_transfer = space + amount;
+    **cpi_ctx
+        .accounts
+        .payer
+        .to_account_info()
+        .try_borrow_mut_lamports()? -= total_transfer;
+    **cpi_ctx
+        .accounts
+        .thread
+        .to_account_info()
+        .try_borrow_mut_lamports()? += total_transfer;
+
+    crate::cpi::create(cpi_ctx, 100, true)?;
+
+    Ok(())
+}
